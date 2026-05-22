@@ -54,7 +54,7 @@ def _list_ec2(want, missing):
                     results.append((
                         inst.get("InstanceId"),
                         inst.get("InstanceType"),
-                        inst.get("State"),
+                        inst["State"]["Name"],
                         tags
                     ))
     return results
@@ -141,4 +141,18 @@ def run(args):
         args.tag          — list[str], each "key=value"
         args.missing_tag  — list[str], each "key"
     """
-    raise NotImplementedError("TODO: implement run() — see module docstring")
+    want = [parse_kv(t) for t in args.tag]
+    missing = args.missing_tag
+
+    rows = DISPATCH[args.type](want, missing)
+
+    # Header
+    tag_str = ", ".join(args.tag) if args.tag else ""
+    missing_str = ", ".join(f"missing:{m}" for m in missing) if missing else ""
+    filter_str = " ".join(filter(None, [tag_str, missing_str]))
+    label = f"{args.type.upper()} {filter_str}".strip()
+    print(f"{label} — {len(rows)} found:")
+    print("-" * 78)
+
+    for row in rows:
+        print(f"  {row[0]:<30} {row[1]:<15} {row[2]:<15} {str(row[3])}")
