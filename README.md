@@ -1,5 +1,7 @@
 # costctl — XBrain W6 side challenge starter
 
+> **Final test score: 25/25 passing**
+
 A starter scaffold for a small AWS-resource-management CLI. **The CLI structure
 is built; you implement the command logic.** Fork this repo, fill in the
 stubs, make the tests pass, customize for your group, then submit.
@@ -32,7 +34,7 @@ You're done when all 25 pass.
 
 ```bash
 # 1. Fork / clone
-git clone <your-fork-url> g<N>-costctl && cd g<N>-costctl
+git clone <your-fork-url> g3-costctl && cd g3-costctl
 
 # 2. Install
 make install-dev                   # or: pip install -r requirements-dev.txt
@@ -271,7 +273,7 @@ Add a `REFLECTIONS.md` to your repo. Sample prompts:
 
 ## Submission checklist (W6 side challenge)
 
-- [ ] Fork → rename to `g<N>-costctl` → clone locally
+- [ ] Fork → rename to `g3-costctl` → clone locally
 - [ ] `make install-dev && make test` shows 10 passed at start
 - [ ] Implement `list` → `pytest tests/test_list.py` all green (7 more pass)
 - [ ] Implement ≥ 2 of (`cost`, `terminate`, `tag`) — `terminate` tests green if you pick it
@@ -280,11 +282,11 @@ Add a `REFLECTIONS.md` to your repo. Sample prompts:
 - [ ] Replace `sample_output/*_example.txt` with real outputs from your account
 - [ ] `REFLECTIONS.md` with 2+ answers
 - [ ] At least 3 meaningful commits (init → first command working → final polish)
-- [ ] Replace `g<N>` placeholders throughout README with your real group number
+- [ ] Replace `g3` placeholders throughout README with your real group number
 - [ ] Add Team section with member names
 - [ ] Tag: `git tag w6-sidechallenge-v1 && git push --tags`
 - [ ] Post link in Slack `#w6-sidechallenge` thread:
-      `G<N> — <repo-url> — implemented: list, cost, terminate (21/25 tests passing)`
+      `G3 — <repo-url> — implemented: list, cost, terminate (21/25 tests passing)`
 
 Reminder: **OPTIONAL and does NOT count toward W6 score.** Recognition is
 separate (Slack callout / Phase 2 selection / portfolio).
@@ -299,11 +301,7 @@ MIT — see `LICENSE`.
 
 ## Team
 
-> Replace before submission:
-
-- <name 1>
-- <name 2>
-- <name 3>
+- Từ Phúc Nguyên
 
 ---
 
