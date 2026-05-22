@@ -46,7 +46,30 @@ from commands._common import parse_kv
 
 def _find_targets(tag_key, tag_val):
     """Return {"ec2": [...], "volume": [...]} matching tag in non-terminal state."""
-    raise NotImplementedError("TODO: implement _find_targets — see test_clean.py")
+    ec2 = boto3.client("ec2")
+    result = {"ec2": [], "volume": []}
+
+    # EC2 — skip terminated/shutting-down
+    paginator = ec2.get_paginator("describe_instances")
+    for page in paginator.paginate(
+        Filters=[{"Name": f"tag:{tag_key}", "Values": [tag_val]}]
+    ):
+        for reservation in page["Reservations"]:
+            for inst in reservation["Instances"]:
+                state = inst["State"]["Name"]
+                if state not in ("terminated", "shutting-down"):
+                    result["ec2"].append(inst["InstanceId"])
+
+    # Volumes — only 'available' (not in-use)
+    vol_paginator = ec2.get_paginator("describe_volumes")
+    for page in vol_paginator.paginate(
+        Filters=[{"Name": f"tag:{tag_key}", "Values": [tag_val]}]
+    ):
+        for vol in page["Volumes"]:
+            if vol["State"] == "available":
+                result["volume"].append(vol["VolumeId"])
+
+    return result
 
 
 def run(args):
@@ -56,4 +79,31 @@ def run(args):
         args.tag    — "key=value" string (REQUIRED)
         args.apply  — bool, must be True to actually delete (default False = dry-run)
     """
-    raise NotImplementedError("TODO: implement run() — see module docstring")
+    tag_key, tag_val = parse_kv(args.tag)
+    targets = _find_targets(tag_key, tag_val)
+
+    ec2_ids = targets["ec2"]
+    vol_ids = targets["volume"]
+
+    if not ec2_ids and not vol_ids:
+        print("Nothing to clean.")
+        return
+
+    # Print plan
+    for iid in ec2_ids:
+        print(f"  EC2 {iid}")
+    for vid in vol_ids:
+        print(f"  Volume {vid}")
+
+    if not args.apply:
+        print(f"(dry-run — pass --apply to delete {len(ec2_ids)} EC2 + {len(vol_ids)} volume(s))")
+        return
+
+    # Apply
+    ec2 = boto3.client("ec2")
+    if ec2_ids:
+        ec2.terminate_instances(InstanceIds=ec2_ids)
+        print(f"Terminated {len(ec2_ids)} EC2 instance(s).")
+    for vid in vol_ids:
+        ec2.delete_volume(VolumeId=vid)
+        print(f"Deleted volume {vid}.")
